@@ -1,0 +1,6 @@
+/**
+ * 
+ * event satus action constants
+ */
+export const EVENT_STATUS_MODEL_CHANGE = 'EVENT_STATUS_MODEL_CHANGE';
+export const EVENT_STATUS_MODEL_FIELD_CHANGE = 'EVENT_STATUS_MODEL_FIELD_CHANGE';

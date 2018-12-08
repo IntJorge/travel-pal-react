@@ -1,0 +1,49 @@
+.CurrencyContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 50%;
+    width: 100%;
+    // border-bottom: 5px solid #114b5f;
+    // padding-left: 20px;
+    // padding-right: 20px;
+
+    &_Input {
+        padding: 20px;
+
+        & input {
+            font-size: 28px;
+            width: 100%;
+            color: #114b5f;
+        }
+    }
+
+    &_Select {
+        // padding: 20px;
+        
+        & select {
+            font-size: 20px;
+            width: 100%;
+            color: #114b5f;
+        }
+    }
+}
+
+.CurrencyButton {
+    width: 50%;
+    padding: 20px;
+
+    & a {
+        text-align: left;
+        justify-content: space-between;
+        display: flex;
+        font-size: 18px;
+        font-weight: bold;
+
+        & i {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+    }
+}

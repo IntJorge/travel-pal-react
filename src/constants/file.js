@@ -1,0 +1,8 @@
+/**
+ * form action constants
+ */
+export const FILE_MODEL_CHANGE = 'FILE_MODEL_CHANGE';
+export const FILE_MODEL_FIELD_CHANGE = 'FILE_MODEL_FIELD_CHANGE';
+export const FILE_MODEL_SAVE = 'FILE_MODEL_SAVE';
+export const FILE_MODEL_REQUEST = 'FILE_MODEL_REQUEST';
+export const FILE_MODEL_RECEIVE = 'FILE_MODEL_RECEIVE';

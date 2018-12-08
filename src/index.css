@@ -1,3 +1,7 @@
+html, body {
+  background-color: #e4fde1;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -11,4 +15,61 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+/* .md .page {
+  background-color: #f5fef4 !important;
+} */
+
+.tab-nav {
+  font-size: 12px !important;
+}
+
+.md .tabbar a.tab-link.tab-link-active, .md .tabbar-labels a.tab-link.tab-link-active, .md .tabbar a.tab-link.active-state, .md .tabbar-labels a.tab-link.active-state {
+  color: #f45b69 !important;
+}
+
+/* #map { 
+  width: 100%;
+  height: 320px;
+} */
+
+.leaflet-container {
+  position: fixed;
+  top: 56px;
+  height: 100vh;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.leaflet-control-zoom-in, 
+.leaflet-control-zoom-out {
+  color: black !important;
+}
+
+/* .places-list {
+  position: fixed;
+  top: 296px;
+  width: 100%;
+  overflow: hidden;
+} */
+
+.navbar-map-slot {
+  margin-top: 56px !important;
+}
+
+.navigation-page-content {
+  padding-top: 304px !important;
+}
+
+.places-searchbar {
+  margin: 0 !important;
+}
+
+.currency-list ul li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.currency-list ul li:last-child {
+  border-bottom: none;
 }
