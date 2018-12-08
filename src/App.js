@@ -19,7 +19,7 @@ import {
   appDeviceReady,
 } from './actions/globals';
 
-
+import AlertPortalContainer from './containers/AlertPortalContainer';
 
 
 const styles = theme => ({
@@ -44,6 +44,7 @@ const MainCmp = withStyles(styles)((props) => {
           <BottomNavigationComponent routes={appRoutes}/>
         </Grid>
       </Grid>
+      <AlertPortalContainer />
     </div>
   )
 });

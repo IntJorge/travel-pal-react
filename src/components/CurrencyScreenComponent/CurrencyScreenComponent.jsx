@@ -1,191 +1,161 @@
 import React from 'react';
-import {
-    Page,
-    PageContent,
-    Navbar,
-    NavLeft,
-    NavTitle,
-    NavRight,
-    Link,
-    Toolbar,
-    Block,
-    BlockTitle,
-    Label,
-    Input,
-    List,
-    ListItem,
-    Icon,
-    F7List,
-    Button,
-    Popup,
-    Subnavbar,
-    ListButton,
-    Searchbar,
-    Row,
-    Col,
-} from 'framework7-react';
+import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Typography from '@material-ui/core/Typography';
+import NumberFormat from 'react-number-format';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import classNames from 'classnames';
+import modStyles from './styles.module.scss';
+import { withStyles } from '@material-ui/core/styles';
+import numeral from 'numeral';
 
-import BaseScreenComponent from '../BaseScreenComponent';
+const format = '0.00a.00';
 
-import styles from './styles.module.scss';
+const styles = {
+  root: {
+    width: '100%',
+  },
+  loader: {
+    position: 'fixed',
+    top: '0px',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    width: '100%',
+    paddingTop: '56px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  content: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+};
 
-// export default ({ onChange, formModel = {} }) => {
-  
-// }
-
-class CurrencyScreenComponent extends React.Component {
+class CurrencyInputCmp extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      popupOpened: false,
-      popupField: '',
-    }
+      value: '0.00',
+    };
   }
 
-  openPopUp = ({ field }) => {
-    this.setState({ popupOpened : true, popupField: field })
-  }
-
-  closePopUp = () => {
-    this.setState({ popupOpened : false, popupField: '' })
-  }
-
-  onListItemSelected = (value) => {
+  handleOnChange = (values) => {
+    const { value} = values;
     const { onChange } = this.props;
 
-    onChange && onChange(this.state.popupField, value);
+    this.setState({
+      value,
+    });
+
+    onChange && onChange(value);
   }
 
   render() {
-    const { onChange, formModel = {} } = this.props;
-    
-    return (
-      <h1>Currency</h1>
-    );
-    
-    return (
-      <BaseScreenComponent title="Converter">
-          <div className={styles.CurrencyContainer}>   
-              <Input
-                className={styles.CurrencyContainer_Input}
-                name="sourceValue"
-                type="number"
-                placeholder="Enter amount"
-                value={formModel['sourceValue'] || ''}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-              />
-              <div className={styles.CurrencyButton}>
-                <Button fill round big onClick={() => { this.openPopUp({field: 'sourceCurrency' })}}>
-                  { formModel['sourceCurrency'] || `Select`}
-                  <Icon material="arrow_drop_down"></Icon>
-                </Button>
-            </div>
-          </div>
-          <div className={styles.CurrencyContainer}>   
-              <Input
-                className={styles.CurrencyContainer_Input}
-                name="destValue"
-                type="number"
-                placeholder="Enter amount"
-                value={formModel['destValue'] || 0}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-                readonly
-                disabled
-              />
-              <div className={styles.CurrencyButton}>
-                <Button fill round big onClick={() => { this.openPopUp({field: 'destCurrency' })}}>
-                  { formModel['destCurrency'] || `Select`}
-                  <Icon material="arrow_drop_down"></Icon>
-                </Button>
-            </div>
-          </div>
-          <Popup opened={this.state.popupOpened} onPopupClosed={() => this.setState({popupOpened : false})}>
-            <Page withSubnavbar>
-              <Navbar title="Searchbar">
-                <Subnavbar inner={false}>
-                  <Searchbar
-                    searchContainer=".search-list"
-                    searchIn=".item-title"
-                    backdrop
-                    backdropEl=".search-list"
-                  ></Searchbar>
-                </Subnavbar>
-                <NavRight>
-                  <Link popupClose>Close</Link>
-                </NavRight>
-              </Navbar>
+    const { isText, isSecondary, value } = this.props;
 
-              <List className="searchbar-not-found">
-                <ListItem title="Nothing found" />
-              </List>
-              <List className="search-list searchbar-found currency-list">
-                <ListButton onClick={() => { this.onListItemSelected('USD'); this.closePopUp(); }} title="(USD) United States Dollar" />
-                <ListButton onClick={() => { this.onListItemSelected('EUR'); this.closePopUp(); }} title="(EUR) Euro" />
-              </List>
-            </Page>
-          </Popup>
-          {/* <List noHairlinesMd>
-            <ListItem>
-              <Label>
-                Amount
-              </Label>
-              <Input
-                name="sourceValue"
-                type="number"
-                placeholder="Enter amount"
-                value={formModel['sourceValue'] || ''}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-              />
-            </ListItem>
-            <ListItem>
-              <Label>
-                Currency
-              </Label>
-              <Input
-                name="sourceCurrency"
-                type="select"
-                placeholder="Please choose..."
-                defaultValue={formModel['sourceCurrency'] || ''}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-              >
-                <option value="">Please choose an option...</option>
-                <option value="USD">(USD) United States Dollar</option>
-                <option value="EUR">(EUR) Euro</option>
-              </Input>
-            </ListItem>
-            <ListItem>
-              <Label>
-                Amount
-              </Label>
-              <Input
-                name="destValue"
-                type="number"
-                placeholder="Enter amount"
-                value={formModel['destValue'] || ''}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-              />
-            </ListItem>
-            <ListItem>
-              <Label>
-                Currency
-              </Label>
-              <Input
-                name="destCurrency"
-                type="select"
-                placeholder="Please choose..."
-                defaultValue={formModel['destCurrency'] || ''}
-                onChange={(e) => onChange(e.target.name, e.target.value)}
-              >
-                <option value="">Please choose an option...</option>
-                <option value="USD">(USD) United States Dollar</option>
-                <option value="EUR">(EUR) Euro</option>
-              </Input>
-            </ListItem>
-          </List> */}
-      </BaseScreenComponent>
+    const className = classNames(modStyles.CurrencyInput, {
+      [modStyles.CurrencyInput__Secondary]: isSecondary,
+    });
+
+    return (
+      <NumberFormat
+        className={className}
+        maxLength={10}
+        placeholder={`0.00`}
+        onValueChange={this.handleOnChange}
+        value={value} 
+        decimalScale={2}
+        thousandSeparator={true}
+        displayType={!isText ? 'input' : 'text'}
+        prefix={''}
+        />
     );
   }
 }
 
-export default CurrencyScreenComponent;
+const CurrencyInput = withStyles(styles)(CurrencyInputCmp);
+
+class CurrencyScreenComponent extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    const { formModel = {}, onChange } = this.props;
+    const sourceValue = formModel['sourceValue'] || '';
+  
+    onChange && onChange('sourceValue', sourceValue);
+  }
+
+  handleOnChange = (value) => {
+    const { onChange } = this.props;
+
+    onChange && onChange('sourceValue', value);
+  }
+
+  render() {
+    const { classes, isLoading, onChange, formModel = {}, currencySymbol, currencyCode, currency } = this.props;
+    let destValue = !formModel['destValue'] ? '0.00' : numeral(formModel['destValue']).format(format);
+
+    return (
+      <Grid container className={classes.root} spacing={0}>
+        <Grid item xs={12}>
+          { isLoading && (
+              <div className={classes.loader}>
+                <CircularProgress />
+              </div>
+            )
+          }
+          {
+            !isLoading && (
+              <div className={modStyles.CurrencyRoot}>
+                <div className={modStyles.CenterArrowIcon}>
+                  <ArrowDownwardIcon />
+                </div>
+                <div className={modStyles.CurrencyContainer}>
+                  <Typography variant="h5">
+                    { 'United States Dollars' }
+                  </Typography>
+                  <br />
+                  <CurrencyInput 
+                    onChange={this.handleOnChange}
+                    value={formModel['sourceValue'] || ''}
+                    currencySymbol={currencySymbol} />
+                  <br />
+                  <Typography variant="h4" gutterBottom>
+                    { 'USD - $' }
+                  </Typography>
+                </div>
+                <div className={modStyles.CurrencyContainer__Secondary}> 
+                  <Typography variant="h5">
+                    { currency }
+                  </Typography>  
+                  <br />
+                  <Typography variant="h2">
+                    { destValue }
+                  </Typography>
+                  <br />
+                  <Typography variant="h4" gutterBottom>
+                    { currencyCode } - { currencySymbol }
+                  </Typography>
+                </div>
+              </div>
+            )
+          }
+        </Grid>
+      </Grid>
+    );
+  }
+}
+
+export default withStyles(styles)(CurrencyScreenComponent);

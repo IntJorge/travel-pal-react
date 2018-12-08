@@ -4,11 +4,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import RestoreIcon from '@material-ui/icons/Restore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-
-import Icon from '@material-ui/core/Icon';
 
 const styles = {
   root: {
@@ -41,7 +36,7 @@ class SimpleBottomNavigation extends React.Component {
             const route = routes[key];
 
             return (
-                <BottomNavigationAction label={route.title} icon={<route.icon />} />
+                <BottomNavigationAction key={`Nav__${route.title}`} label={route.title} icon={<route.icon />} />
             )
         });
     }
@@ -52,17 +47,14 @@ class SimpleBottomNavigation extends React.Component {
 
     return (
         <BottomNavigation
-        value={value}
-        onChange={this.handleChange}
-        showLabels
-        className={classes.root}
+            value={value}
+            onChange={this.handleChange}
+            showLabels
+            className={classes.root}
         >
         {
             this.renderRoutes()
         }
-        {/* <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-        <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
-        <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} /> */}
         </BottomNavigation>
     );
     }

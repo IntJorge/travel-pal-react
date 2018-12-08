@@ -24,3 +24,24 @@ export const makeSelectGlobalLocationWatchId = () => createSelector(
         return !globalState ? Immutable.Map() : globalState.getIn(['locationWatchId'])
     }
 );
+
+export const makeSelectGlobalAlertIsOpen = () => createSelector(
+    getGlobalState,
+    (globalState) => {
+        return !globalState ? Immutable.Map() : globalState.getIn(['alert', 'isOpen'])
+    }
+);
+
+export const makeSelectGlobalAlertTitle = () => createSelector(
+    getGlobalState,
+    (globalState) => {
+        return !globalState ? Immutable.Map() : globalState.getIn(['alert', 'title'])
+    }
+);
+
+export const makeSelectGlobalAlertDescription = () => createSelector(
+    getGlobalState,
+    (globalState) => {
+        return !globalState ? Immutable.Map() : globalState.getIn(['alert', 'description'])
+    }
+);

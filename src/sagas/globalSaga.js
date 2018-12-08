@@ -24,6 +24,8 @@ import {
 import {
     appLocationChange,
     appLocationWatchChange,
+    appLocationRequest,
+    appAlertShow,
 } from '../actions/globals';
 
 import {
@@ -54,6 +56,9 @@ const globalChannel = channel();
 
 const getGlobalLocationWatchId = makeSelectGlobalLocationWatchId();
 
+/**
+ * global application saga
+ */
 function* globalSaga() {
     yield all([
         watchDeviceReadySaga(),
@@ -63,14 +68,23 @@ function* globalSaga() {
     ]);
 }
 
+/**
+ * watch for device ready action
+ */
 function* watchDeviceReadySaga() {
     yield takeLatest(APP_DEVICE_READY, handleAppDeviceReady);
 }
 
+/**
+ * watch for geolocation request actions
+ */
 function* watchDeviceLocationRequestSaga() {
     yield takeLatest(APP_LOCATION_REQUEST, handleDeviceLocationRequest);
 }
 
+/**
+ * watch for geolocation watch clear request actions
+ */
 function* watchDeviceLocationWatchClearSaga() {
     yield takeLatest(APP_LOCATION_WATCH_CLEAR, handleDeviceLocationWatchClear);
 }
@@ -78,8 +92,8 @@ function* watchDeviceLocationWatchClearSaga() {
 function* handleAppDeviceReady(action) {
     try {
 
-        console.debug("Action", action);
-    
+        console.debug("App Device Ready.");
+        yield put(appLocationRequest());
         // FileHelper.requestFileSystem({
         //     fileName: 'globals.json',
         //     onSuccess: (fileEntry) => {
@@ -123,15 +137,36 @@ function* handleDeviceLocationRequest(action) {
         fromSaga: true,
     }));
 
-    const watchId = yield call(Helpers.watchLocation, ({ onSuccess: ({ lat, lng }) => {
-        globalChannel.put(appLocationChange({ lat, lng }));
+    yield call(Helpers.getCurrentLatLng, (
+        { 
+            onSuccess: ({ lat, lng }) => {
+                console.debug("GPS Successful", lat, lng);
+                globalChannel.put(appLocationChange({ lat, lng }));
 
-        ApiHelper.getLocationDetails({ lat, lng, onSuccess: (locData) => {
-            globalChannel.put(formModelChange({ meta: 'placeInfo', overrideModel: { ...locData}, fromSaga: true }));
-        }});
-    }}));
+                ApiHelper.getLocationDetails({ 
+                    lat,
+                    lng,
+                    onSuccess: (locData) => {
+                        globalChannel.put(formModelChange({ meta: 'placeInfo', overrideModel: { ...locData}, fromSaga: true }));
+                    },
+                    onError: (error) => {
+                        globalChannel.put(appAlertShow({ title: 'OpenCage API Error', description: 'Oops! Error encountered while fething data from OpenCage. Please refresh the map.'}));
 
-    yield put(appLocationWatchChange({ watchId }));
+                        // yield call(delay, 2000);
+                        globalChannel.put(eventStatusModelFieldChange({
+                            meta: 'placeInfo',
+                            field: 'isLoading',
+                            value: false,
+                            fromSaga: true,
+                        }));
+                    },
+                });
+            },
+            onError: (e) => {     
+                globalChannel.put(appAlertShow({ title: 'GPS Error', description: 'Oops! Location cannot be fetched at the moment. Please refresh the map.'}));
+            },
+        }
+    ));
 }
 
 function* handleDeviceLocationWatchClear(action) {

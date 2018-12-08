@@ -40,9 +40,9 @@ const makeMapStateToProps = () => {
       const formModel = getFormModel(state)('placeInfo');
       const isPlaceInfoLoading = getEventStatusField(state)('placeInfo', 'isLoading') || false;
 
-      console.debug("FILE MODEL", fileModel && fileModel.toJS());
-      console.debug("FORM MODEL", formModel && formModel.toJS());
-      console.debug("Location", location && location.toJS());
+      // console.debug("FILE MODEL", fileModel && fileModel.toJS());
+      // console.debug("FORM MODEL", formModel && formModel.toJS());
+      // console.debug("Location", location && location.toJS());
 
       return {
           gpsLocation: location,

@@ -1,3 +1,6 @@
+/**
+ * currency saga
+ */
 import {
     takeLatest,
     call,
@@ -20,89 +23,47 @@ import {
 
 import ApiHelper from '../utils/api';
 
+/**
+ * saga for source amount field change
+ */
 function* currencySaga() {
-  yield takeLatest(FORM_MODEL_FIELD_CHANGE, handleFieldChange);
+  yield takeLatest([FORM_MODEL_FIELD_CHANGE], handleFieldChange);
 }
 
 function* handleFieldChange(action) {
-    const { meta, field, fromSaga } = action;
+    const { meta, field, fromSaga, type } = action;
 
     if(meta === 'currency' && !fromSaga) {
         try {
             const getFormModel = makeSelectFormModelByMeta();
             const formModelIM = yield select(state => getFormModel(state)('currency'));
-            const formModel = !formModelIM ? {} : formModelIM.toJS();
-            console.debug("CURRENCY SAGA MODEL", formModel);
+            const placeInfoModelIM = yield select(state => getFormModel(state)('placeInfo'));
 
-            if (!formModel || !formModel.sourceCurrency || !formModel.destCurrency)
-                return;
+            const sourceCurrencyCode = 'USD';
+            const destCurrencyCode = !placeInfoModelIM ? 'USD' : placeInfoModelIM.getIn(['currency_code']) || 'USD';
+            const sourceValue = !formModelIM ? 0 : formModelIM.getIn(['sourceValue']) || 0;
 
-            const eventFromSrc = field === 'sourceValue' || field === 'sourceCurrency';
+            let destValue = '0.00';
+            // console.debug("CURR", sourceValue, destCurrencyCode);
 
-            if(eventFromSrc && (!formModel.sourceValue || !formModel.sourceCurrency || !formModel.destCurrency))
-                return;
-            if(!eventFromSrc && (!formModel.sourceCurrency || !formModel.destCurrency))
-                return;
-            // if(!eventFromSrc && (!formModel.destValue || !formModel.sourceCurrency || !formModel.destCurrency))
-            //     return;
+            if (sourceCurrencyCode === destCurrencyCode) {
+                destValue = parseFloat(sourceValue).toFixed(2);
+            } else {
+                const rates = yield call(ApiHelper.getRates, {
+                    from: sourceCurrencyCode,
+                    to: destCurrencyCode,
+                });
 
-            // yield call(ApiHelper.getRates, {
-            //     from: eventFromSrc ? formModel.sourceCurrency : formModel.destCurrency,
-            //     to: eventFromSrc ? formModel.destCurrency : formModel.sourceCurrency,
-            //     onSuccess: (rates) => {
-            //         console.debug("RATES", rates);
-            //         if (eventFromSrc) {
-            //             const converted = formModel.sourceValue * rates;
-
-            //             yield put(formModelFieldChange({
-            //                 meta: 'currency',
-            //                 field: 'destValue',
-            //                 value: converted,
-            //             }));
-            //         } else {
-            //             const converted = formModel.destValue * rates;
-
-            //             yield put(formModelFieldChange({
-            //                 meta: 'currency',
-            //                 field: 'sourceValue',
-            //                 value: converted,
-            //             }));
-            //         }
-            //     },
-            // });
-            const rates = yield call(ApiHelper.getRates, {
-                from: eventFromSrc ? formModel.sourceCurrency : formModel.destCurrency,
-                to: eventFromSrc ? formModel.destCurrency : formModel.sourceCurrency,
-            });
-
-            // console.debug("RATES", rates);
-            const converted = (formModel.sourceValue * rates).toFixed(2);
+                // console.debug("RATES", rates);
+                destValue = (sourceValue * rates).toFixed(2);
+            }
 
             yield put(formModelFieldChange({
                 meta: 'currency',
                 field: 'destValue',
-                value: converted,
+                value: destValue,
                 fromSaga: true,
             }));
-            // if (eventFromSrc) {
-            //     const converted = (formModel.sourceValue * rates).toFixed(2);
-
-            //     yield put(formModelFieldChange({
-            //         meta: 'currency',
-            //         field: 'destValue',
-            //         value: converted,
-            //         fromSaga: true,
-            //     }));
-            // } else {
-            //     const converted = (formModel.destValue * rates).toFixed(2);
-
-            //     yield put(formModelFieldChange({
-            //         meta: 'currency',
-            //         field: 'sourceValue',
-            //         value: converted,
-            //         fromSaga: true,
-            //     }));
-            // }
 
         } catch(error) {
             console.error("Currency Saga Error", error);

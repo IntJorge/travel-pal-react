@@ -36,14 +36,12 @@ class NavigationScreenComponent extends React.Component {
   }
 
   componentDidMount() {
-    console.debug("Mounted");
     const { onLocationRequest } = this.props;
 
     onLocationRequest && onLocationRequest();
   }
 
   componentWillUnmount() {
-    console.debug("Unmounting");
     const { onStopLocationWatch } = this.props;
 
     onStopLocationWatch && onStopLocationWatch();
@@ -72,13 +70,12 @@ class NavigationScreenComponent extends React.Component {
   }
 
   render() {
-    const { classes, gpsLocation, placeInfo, isPlaceInfoLoading } = this.props;
+    const { classes, gpsLocation, placeInfo, isPlaceInfoLoading, onLocationRequest } = this.props;
 
-    console.debug("IS LOADING", isPlaceInfoLoading);
     return (
       <Grid container className={classes.root} spacing={0}>
         <Grid item xs={12}>
-          <LocationMapComponent gpsLocation={gpsLocation} isPlaceInfoLoading={isPlaceInfoLoading} />
+          <LocationMapComponent onLocationRequest={onLocationRequest} gpsLocation={gpsLocation} isPlaceInfoLoading={isPlaceInfoLoading} />
           {
             placeInfo && (
               <div className={classes.placeInfo}>

@@ -5,6 +5,8 @@ import {
     APP_LOCATION_CHANGE,
     APP_LOCATION_WATCH_CHANGE,
     APP_LOCATION_WATCH_CLEAR,
+    APP_ALERT_SHOW,
+    APP_ALERT_DISMISS,
 } from '../constants/globals';
 
 
@@ -21,6 +23,11 @@ const initialState = fromJS({
     },
     locationWatchId: null,
     test: 'test',
+    alert: {
+        isOpen: false,
+        title: '',
+        description: '',
+    },
 });
 
 
@@ -39,6 +46,13 @@ const globalReducer = (state = initialState, action) => {
             return state.setIn(['locationWatchId'], action.watchId);
         case APP_LOCATION_WATCH_CLEAR:
             return state.setIn(['locationWatchId'], null);
+        case APP_ALERT_SHOW:
+            return state
+                    .setIn(['alert', 'isOpen'], true)
+                    .setIn(['alert', 'title'], action.title)
+                    .setIn(['alert', 'description'], action.description);
+        case APP_ALERT_DISMISS:
+            return state.setIn(['alert', 'isOpen'], false);
         default:
             return state;
     }

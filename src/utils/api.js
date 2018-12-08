@@ -26,7 +26,6 @@ const ApiHelper = {
         .then(function (response) {
             // handle success
             console.debug("Opencage", response);
-
             onSuccess && onSuccess(destructureLocData({ data: response.data }));
 
         })
