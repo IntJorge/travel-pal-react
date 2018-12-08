@@ -1,77 +1,84 @@
 import React from 'react';
-import {
-    Page,
-    Navbar,
-    NavLeft,
-    NavTitle,
-    NavRight,
-    Link,
-    Toolbar,
-    Block,
-} from 'framework7-react';
-
-import BaseScreenComponent from '../BaseScreenComponent';
-
-import TextField from '@material-ui/core/TextField';
-
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Grid';
+import WeatherTableComponent from './WeatherTableComponent';
+import WeatherItemComponent from './WeatherItemComponent';
+import changeCase from 'change-case';
 
-
-const styles = theme => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
+const styles = {
+  root: {
+    width: '100%',
   },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: 200,
+  content: {
+    width: '100%',
+    paddingTop: '56px',
+    paddingBottom: '66px',
   },
-  dense: {
-    marginTop: 19,
+  title: {
+    color: '#3f51b5',
+    padding: '5px',
+    textAlign: 'center',
+    paddingTop: '0px',
+    paddingBottom: '0px',
   },
-  menu: {
-    width: 200,
+  subTitle: {
+    color: '#3f51b5',
+    padding: '5px',
+    textAlign: 'center',
+    paddingTop: '0px',
+    paddingBottom: '0px',
   },
-});
+  icon: {
+    textAlign: 'center',
+  },
+};
 
-
-const TextCMP = withStyles(styles)((props) => {
-  const { classes } = props;
-
-  return (
-    <div>
-      <TextField
-        id="standard-name"
-        label="Name"
-        fullWidth
-        // className={classes.textField}
-        // value={this.state.name}
-        // onChange={this.handleChange('name')}
-        margin="normal"
-      />
-    </div>
-  );
-})
 
 class WeatherScreenComponent extends React.Component {
   constructor(props) {
     super(props);
   }
+
+  componentDidMount() {
+    const { onWeatherRequest } = this.props;
+
+    // onWeatherRequest && onWeatherRequest();
+  }
   
   render() {
+    const { classes, weather, isPlaceInfoLoading, isWeatherInfoLoading } = this.props;
+    const { toEnum = {}, info = {} } = weather;
+    // console.debug("WEATHER", weather);
+
     return (
-      <TextCMP />
+      <Grid container className={classes.root} spacing={0}>
+        <Grid item xs={12}>
+          {
+            (!isWeatherInfoLoading) && (
+              <div className={classes.content}>
+                <h1 className={classes.title}>Weather in { info.place }</h1>
+                <h5 className={classes.icon}><img src={info.iconUrl} /></h5>
+                <h4 className={classes.subTitle}>{ info.description }</h4>
+                <h4 className={classes.subTitle}>{ info.date }</h4>
+                {
+                  Object.keys(toEnum).map(key => {
+                    const name = changeCase.upperCaseFirst(key);
+
+                    return (
+                      <WeatherItemComponent key={name} name={name} value={toEnum[key]} />
+                    )
+                  })
+                }
+                {/* <WeatherTableComponent /> */}
+              </div>
+            )
+          }
+        </Grid>
+      </Grid>
     );
-    // return (
-    //   <BaseScreenComponent title="Weather">
-    //     <Block strong>
-    //       <p>Weather HERE</p>
-    //     </Block>
-    //   </BaseScreenComponent>
-    // );
   }
 }
 
-export default WeatherScreenComponent;
+export default withStyles(styles)(WeatherScreenComponent);

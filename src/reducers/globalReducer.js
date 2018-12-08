@@ -7,6 +7,7 @@ import {
     APP_LOCATION_WATCH_CLEAR,
     APP_ALERT_SHOW,
     APP_ALERT_DISMISS,
+    APP_WEATHER_CHANGE,
 } from '../constants/globals';
 
 
@@ -28,6 +29,7 @@ const initialState = fromJS({
         title: '',
         description: '',
     },
+    weather: {},
 });
 
 
@@ -53,6 +55,8 @@ const globalReducer = (state = initialState, action) => {
                     .setIn(['alert', 'description'], action.description);
         case APP_ALERT_DISMISS:
             return state.setIn(['alert', 'isOpen'], false);
+        case APP_WEATHER_CHANGE:
+            return state.setIn(['weater'], action.weather);
         default:
             return state;
     }

@@ -45,3 +45,10 @@ export const makeSelectGlobalAlertDescription = () => createSelector(
         return !globalState ? Immutable.Map() : globalState.getIn(['alert', 'description'])
     }
 );
+
+export const makeSelectGlobalWeather = () => createSelector(
+    getGlobalState,
+    (globalState) => {
+        return !globalState ? Immutable.Map() : globalState.getIn(['weater'])
+    }
+);

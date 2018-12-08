@@ -110,6 +110,6 @@
     <plugin name="cordova-plugin-whitelist" spec="^1.2.2" />
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <plugin name="cordova-plugin-file" spec="^4.3.3" />
-    <engine name="android" spec="^7.0.0" />
     <plugin name="cordova-plugin-dialogs" spec="^1.3.4" />
+    <engine name="android" spec="^7.0.0" />
 </widget>

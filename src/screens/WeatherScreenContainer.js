@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { fromJS } from 'immutable';
 
 import {
     fileModelFieldChange,
@@ -8,18 +9,34 @@ import {
     makeSelectFileModelByMeta,
 } from '../selectors/file';
 
+import {
+    makeSelectGlobalWeather,
+} from '../selectors/globals';
+
+import {
+    appWeatherRequest,
+} from '../actions/globals';
+
+import {
+    makeSelectEventStatusModelFieldByMeta,
+} from '../selectors/eventStatus';
+
 import HOCToJS from '../components/HOCToJS';
 import WeatherScreenComponent from '../components/WeatherScreenComponent';
 
 const makeMapStateToProps = () => {
-    const getFileModel = makeSelectFileModelByMeta()
+    const getWeather = makeSelectGlobalWeather()
+    const getEventStatusField = makeSelectEventStatusModelFieldByMeta();
 
     const mapStateToProps = (state, ownProps) => {
-        const fileModel = getFileModel(state)('persistent');
-        console.debug("FILE MODEL", fileModel && fileModel.toJS());
+        const weather = getWeather(state) || fromJS({});
+        const isPlaceInfoLoading = getEventStatusField(state)('placeInfo', 'isLoading') || false;
+        const isWeatherInfoLoading = getEventStatusField(state)('weatherInfo', 'isLoading') || false;
 
         return {
-            fileModel,
+            weather,
+            isPlaceInfoLoading,
+            isWeatherInfoLoading,
             ...ownProps,
         };
     };
@@ -29,11 +46,9 @@ const makeMapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        // onChange: (field, value) => dispatch(formModelFieldChange({
-        //     meta: 'currency',
-        //     field,
-        //     value,
-        // })),
+        onWeatherRequest: () => {
+            dispatch(appWeatherRequest());
+        },
     };
 };
 

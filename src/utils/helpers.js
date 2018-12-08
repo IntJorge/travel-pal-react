@@ -4,7 +4,7 @@ const defaultOnError = (e) => {
 }
 const Helpers = {
     watchLocation: ({ onSuccess, onError = defaultOnError, options = {...defaultOptions}}) => {
-        console.debug("Helpers.watchLocation: getting gps details");
+        // console.debug("Helpers.watchLocation: getting gps details");
 
         return navigator.geolocation.watchPosition((position) => {
             if (typeof position !== 'undefined') {
@@ -21,7 +21,7 @@ const Helpers = {
     },
     getCurrentLatLng: ({ onSuccess, onError, options = defaultOptions } = {}) => {
         navigator.geolocation.getCurrentPosition((position) => {
-            console.debug("POSITION", position);
+            // console.debug("POSITION", position);
             if (typeof position !== 'undefined') {
                 onSuccess && onSuccess({
                     lat: position.coords.latitude,
@@ -31,7 +31,7 @@ const Helpers = {
         }, onError, options);
     },
     stopLocationWatch: ({ watchId }) => {
-        console.log("Clearing watch id");
+        // console.debug("Clearing watch id");
         navigator.geolocation.clearWatch(watchId);
     }
 }

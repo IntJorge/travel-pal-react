@@ -6,6 +6,8 @@ import {
     APP_LOCATION_WATCH_CLEAR,
     APP_ALERT_SHOW,
     APP_ALERT_DISMISS,
+    APP_WEATHER_CHANGE,
+    APP_WEATHER_REQUEST,
 } from '../constants/globals';
 
 
@@ -56,3 +58,18 @@ export const appAlertDismiss = () => {
         type: APP_ALERT_DISMISS,
     };
 };
+
+export const appWeatherRequest = () => {
+    return {
+        type: APP_WEATHER_REQUEST,
+    };
+};
+
+export const appWeatherChange = ({ weather }) => {
+    return {
+        type: APP_WEATHER_CHANGE,
+        weather,
+    };
+};
+
+

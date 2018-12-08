@@ -26,6 +26,7 @@ import {
     appLocationWatchChange,
     appLocationRequest,
     appAlertShow,
+    appWeatherChange,
 } from '../actions/globals';
 
 import {
@@ -41,11 +42,13 @@ import {
 } from '../constants/form';
 
 import {
+    APP_WEATHER_REQUEST,
     APP_LOCATION_WATCH_CLEAR,
 } from '../constants/globals';
 
 import {
     makeSelectGlobalLocationWatchId,
+    makeSelectGlobalLocation,
 } from '../selectors/globals';
 
 import FileHelper from '../utils/files';
@@ -55,6 +58,7 @@ import Helpers from '../utils/helpers';
 const globalChannel = channel();
 
 const getGlobalLocationWatchId = makeSelectGlobalLocationWatchId();
+const getGlobalLocation = makeSelectGlobalLocation();
 
 /**
  * global application saga
@@ -65,28 +69,36 @@ function* globalSaga() {
         watchGlobalChannel(),
         watchDeviceLocationRequestSaga(),
         watchDeviceLocationWatchClearSaga(),
+        watchDeviceWeatherRequest(),
     ]);
 }
 
 /**
- * watch for device ready action
+ * watches for device ready action
  */
 function* watchDeviceReadySaga() {
     yield takeLatest(APP_DEVICE_READY, handleAppDeviceReady);
 }
 
 /**
- * watch for geolocation request actions
+ * watches for geolocation request actions
  */
 function* watchDeviceLocationRequestSaga() {
     yield takeLatest(APP_LOCATION_REQUEST, handleDeviceLocationRequest);
 }
 
 /**
- * watch for geolocation watch clear request actions
+ * watches for geolocation watch clear request actions
  */
 function* watchDeviceLocationWatchClearSaga() {
     yield takeLatest(APP_LOCATION_WATCH_CLEAR, handleDeviceLocationWatchClear);
+}
+
+/**
+ * watches for weather request actions
+ */
+function* watchDeviceWeatherRequest() {
+    yield takeLatest(APP_WEATHER_REQUEST, handleDeviceWeatherRequest);
 }
 
 function* handleAppDeviceReady(action) {
@@ -140,7 +152,7 @@ function* handleDeviceLocationRequest(action) {
     yield call(Helpers.getCurrentLatLng, (
         { 
             onSuccess: ({ lat, lng }) => {
-                console.debug("GPS Successful", lat, lng);
+                // console.debug("GPS Successful", lat, lng);
                 globalChannel.put(appLocationChange({ lat, lng }));
 
                 ApiHelper.getLocationDetails({ 
@@ -161,6 +173,40 @@ function* handleDeviceLocationRequest(action) {
                         }));
                     },
                 });
+
+                globalChannel.put(eventStatusModelFieldChange({
+                    meta: 'weatherInfo',
+                    field: 'isLoading',
+                    value: true,
+                    fromSaga: true,
+                }));
+
+                ApiHelper.getWeather({
+                    lat,
+                    lng,
+                    onSuccess: (weatherData) => {
+                        // console.debug("WEATHER DATA", weatherData);
+                        globalChannel.put(appWeatherChange({ weather: weatherData }));
+                    
+                        globalChannel.put(eventStatusModelFieldChange({
+                            meta: 'weatherInfo',
+                            field: 'isLoading',
+                            value: false,
+                            fromSaga: true,
+                        }));
+                    },
+                    onError: (error) => {
+                        globalChannel.put(appAlertShow({ title: 'OpenWeather API Error', description: 'Oops! Error encountered while fething data from OpenWeather. Please refresh the map.'}));
+
+                        // yield call(delay, 2000);
+                        globalChannel.put(eventStatusModelFieldChange({
+                            meta: 'weatherInfo',
+                            field: 'isLoading',
+                            value: false,
+                            fromSaga: true,
+                        }));
+                    },
+                });
             },
             onError: (e) => {     
                 globalChannel.put(appAlertShow({ title: 'GPS Error', description: 'Oops! Location cannot be fetched at the moment. Please refresh the map.'}));
@@ -175,6 +221,44 @@ function* handleDeviceLocationWatchClear(action) {
     if (watchId !== undefined && watchId !== null) {
         Helpers.stopLocationWatch({ watchId });
     }
+}
+
+function* handleDeviceWeatherRequest(action) {
+    const location = yield select(state => getGlobalLocation(state));
+
+    if (!location) return;
+
+    const lat = location.getIn(['lat']);
+    const lng = location.getIn(['lng']);
+
+    if (!lat || !lng) return;
+
+    ApiHelper.getWeather({
+        lat,
+        lng,
+        onSuccess: (weatherData) => {
+            // console.debug("WEATHER DATA", weatherData);
+            globalChannel.put(appWeatherChange({ weather: weatherData }));
+        
+            globalChannel.put(eventStatusModelFieldChange({
+                meta: 'weatherInfo',
+                field: 'isLoading',
+                value: false,
+                fromSaga: true,
+            }));
+        },
+        onError: (error) => {
+            globalChannel.put(appAlertShow({ title: 'OpenWeather API Error', description: 'Oops! Error encountered while fething data from OpenWeather. Please refresh the map.'}));
+
+            // yield call(delay, 2000);
+            globalChannel.put(eventStatusModelFieldChange({
+                meta: 'weatherInfo',
+                field: 'isLoading',
+                value: false,
+                fromSaga: true,
+            }));
+        },
+    });
 }
 
 
